@@ -18,7 +18,8 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private User customer;
+    @Column(name = "customer")
+    private Long customerId;
 
     private Long total;
 
