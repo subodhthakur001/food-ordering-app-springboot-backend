@@ -1,7 +1,7 @@
-package com.example.service;
+package com.example.service.auth;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
+import com.example.dao.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

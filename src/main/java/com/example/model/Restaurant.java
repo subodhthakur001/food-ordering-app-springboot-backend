@@ -28,6 +28,8 @@ public class Restaurant implements Serializable {
 
     private String description;
 
+    private String cuisineType;
+
     @OneToOne
     private Address address;
 
@@ -45,7 +47,7 @@ public class Restaurant implements Serializable {
 
     private LocalDateTime registrationDate;
 
-    private  boolean open;
+    private Boolean open;
 
     @JsonIgnore
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)

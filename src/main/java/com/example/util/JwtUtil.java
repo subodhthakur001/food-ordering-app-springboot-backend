@@ -29,11 +29,16 @@ public class JwtUtil {
         return extractAllClaims(token).getExpiration();
     }
 
+    public String extractEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("email", String.class); // Assuming "email" is stored as a claim in the JWT
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token.trim())
                 .getPayload();
     }
 
@@ -41,9 +46,8 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username,Long userId) {
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
         return createToken(claims, username);
     }
 

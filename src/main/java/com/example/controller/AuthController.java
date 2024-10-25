@@ -2,11 +2,11 @@ package com.example.controller;
 
 import com.example.model.Cart;
 import com.example.model.User;
-import com.example.repository.CartRepository;
-import com.example.repository.UserRepository;
-import com.example.request.LoginRequest;
-import com.example.response.AuthResponse;
-import com.example.service.UserDetailsServiceImpl;
+import com.example.dao.CartRepository;
+import com.example.dao.UserRepository;
+import com.example.request.auth.LoginRequest;
+import com.example.response.auth.AuthResponse;
+import com.example.service.auth.UserDetailsServiceImpl;
 import com.example.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class AuthController {
         cartRepository.save(createdCart);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String jwt = jwtUtil.generateToken(userDetails.getUsername(), savedUser.getId());
+        String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
         AuthResponse response = new AuthResponse(jwt, "Success register",savedUser.getRole());
 
@@ -79,9 +79,8 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             User dbUser = userRepository.findByEmail(loginRequest.getEmail());
-            Long userId = dbUser.getId();
             UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
-            String jwt = jwtUtil.generateToken(userDetails.getUsername(),userId);
+            String jwt = jwtUtil.generateToken(userDetails.getUsername());
             AuthResponse response = new AuthResponse(jwt,"Login successful.",dbUser.getRole());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {

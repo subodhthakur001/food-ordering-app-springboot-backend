@@ -1,4 +1,4 @@
-package com.example.response;
+package com.example.response.auth;
 
 import com.example.model.USER_ROLE;
 import lombok.AllArgsConstructor;
