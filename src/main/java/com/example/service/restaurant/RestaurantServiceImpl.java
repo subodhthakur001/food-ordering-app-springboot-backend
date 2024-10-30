@@ -2,33 +2,54 @@ package com.example.service.restaurant;
 
 import com.example.dao.AddressRepository;
 import com.example.dao.RestaurantRepository;
+import com.example.dao.UserRepository;
 import com.example.dto.RestaurantDTO;
 import com.example.model.Address;
 import com.example.model.Restaurant;
+import com.example.model.USER_ROLE;
 import com.example.model.User;
 import com.example.request.restaurant.CreateRestaurantRequest;
+import com.example.service.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class RestaurantServiceImpl implements RestaurantService{
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final UserService userService;
 
-    public RestaurantServiceImpl(RestaurantRepository restaurantRepository, AddressRepository addressRepository) {
+    @Autowired
+    public RestaurantServiceImpl(RestaurantRepository restaurantRepository,
+                                 AddressRepository addressRepository,
+                                 UserService userService,
+                                 UserRepository userRepository) {
         this.restaurantRepository = restaurantRepository;
         this.addressRepository = addressRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
     public Restaurant createRestaurant(CreateRestaurantRequest req, User user) throws Exception {
+        if (restaurantRepository.findByOwnerId(user.getId()) != null) {
+            throw new Exception("User already has a restaurant.");
+        }
         Address savedAddress = addressRepository.save(req.getAddress());
         Restaurant restaurant = new Restaurant();
         restaurant.setName(req.getName());
+        restaurant.setOwner(user);
         restaurant.setDescription(req.getDescription());
         restaurant.setCuisineType(req.getCuisineType());
         restaurant.setContactInformation(req.getContactInformation());
+        restaurant.setOpen(req.getOpen());
         restaurant.setOpeningHours(req.getOpeningHours());
         restaurant.setImages(req.getImages());
         restaurant.setAddress(savedAddress);
@@ -54,10 +75,15 @@ public class RestaurantServiceImpl implements RestaurantService{
     public Restaurant deleteRestaurant(Long restaurantId) throws Exception {
         Restaurant isRestaurantExist = findRestaurantById(restaurantId);
         restaurantRepository.delete(isRestaurantExist);
+        return isRestaurantExist;
     }
 
     @Override
-    public List<Restaurant> restaurantList() {
+    public List<Restaurant> restaurantList(User user) throws Exception {
+        USER_ROLE role = userService.findRoleByEmail(user.getEmail());
+        if(role.toString().equals("ROLE_RESTAURANT_OWNER")){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you are not authorized to access this resource");
+        }
         return restaurantRepository.findAll();
     }
 
@@ -90,12 +116,21 @@ public class RestaurantServiceImpl implements RestaurantService{
          dto.setDescription(restaurant.getDescription());
          dto.setImages(restaurant.getImages());
 
-         if(user.getFavourites().contains(dto)){
-             user.getFavourites().remove(dto);
+         List<RestaurantDTO> favorites = user.getFavourites();
+         boolean flag = false;
+         for(RestaurantDTO favourite : favorites){
+             if(favourite.getId().equals(restaurantId)){
+                 flag = true;
+                 break;
+             }
+         }
+         if(flag){
+             favorites.removeIf(favorite -> favorite.getId().equals(restaurantId));
          }
          else{
-             user.getFavourites().add(dto);
+             favorites.add(dto);
          }
+         userRepository.save(user);
          return dto;
     }
 

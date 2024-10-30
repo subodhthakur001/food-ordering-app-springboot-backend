@@ -15,7 +15,7 @@ public interface RestaurantService {
 
     public Restaurant deleteRestaurant(Long restaurantId) throws Exception;
 
-    public List<Restaurant> restaurantList();
+    public List<Restaurant> restaurantList(User user) throws Exception;
 
     public List<Restaurant> searchRestaurant(String keyword);
 

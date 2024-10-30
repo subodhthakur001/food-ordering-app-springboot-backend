@@ -1,5 +1,6 @@
 package com.example.service.user;
 
+import com.example.model.USER_ROLE;
 import com.example.model.User;
 import com.example.dao.UserRepository;
 import com.example.util.JwtUtil;
@@ -38,5 +39,14 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("User not found with this email " + email);
         }
         return user;
+    }
+
+    @Override
+    public USER_ROLE findRoleByEmail(String email) throws Exception {
+        User user = userRepository.findByEmail(email);
+        if(user == null){
+            throw new EntityNotFoundException("User not found with this email " + email);
+        }
+        return user.getRole();
     }
 }

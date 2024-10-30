@@ -23,14 +23,16 @@ public class CreateRestaurantRequest {
     @NotBlank(message = "cuisineType of the restaurant should not be blank")
     @JsonProperty("cuisine_type")
     private String cuisineType;
-    @NotBlank(message = "address of the restaurant should not be blank")
+    @NotNull(message = "address of the restaurant should not be blank")
     private Address address;
-    @NotBlank(message = "contact Information of the restaurant should not be blank")
+    @NotNull(message = "contact Information of the restaurant should not be blank")
     @JsonProperty("contact_information")
     private ContactInformation contactInformation;
     @NotBlank(message = "openingHours of the restaurant should not be blank")
     @JsonProperty("opening_hours")
     private String openingHours;
+    @NotNull(message = "openingHours of the restaurant should not be blank")
+    private Boolean open;
     @NotNull(message = "images of the restaurant should not be blank")
     private List<String> images;
 }

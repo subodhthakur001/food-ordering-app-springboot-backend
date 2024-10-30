@@ -1,4 +1,4 @@
-package com.example.controller;
+package com.example.controller.auth;
 
 import com.example.model.Cart;
 import com.example.model.User;
